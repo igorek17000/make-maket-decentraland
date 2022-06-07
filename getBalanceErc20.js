@@ -7,7 +7,7 @@ export const getBalanceErc20 = async (privateKey, ecr20Address) => {
   const account = wallet.connect(provider);
   // get public key
   const publicKey = account.address;
-  console.log("test");
+
   const ecr20Contract = new ethers.Contract(
     ecr20Address,
     getABIToPath("ecr20abi.json"),

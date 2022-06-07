@@ -1,4 +1,4 @@
-import { swap } from "./bot.js";
+import { swap } from "./swap.js";
 import { getBalanceErc20 } from "./getBalanceErc20.js";
 import configData from "./config.js";
 import ethers from "ethers";
@@ -16,19 +16,22 @@ export async function buyToBalance(
 
   const { balance, decimal } = await getBalanceErc20(privateKey, tokenIn);
   const formatBalance = ethers.utils.formatUnits(balance, Number(decimal));
+  const amountSwapToken0 = (Number(formatBalance) * Number(percent)).toFixed(4);
+  console.log("amountSwapToken0", amountSwapToken0);
   const result = await swap({
     recipient: publicKey,
     privateKey,
     tokenIn,
     tokenOut,
-    amountSwapToken0: (Number(formatBalance) * Number(percent)).toFixed(4),
+    amountSwapToken0,
   });
 
   console.log("result ", result);
 }
+
 buyToBalance(
   configData.PRIVATE_KEY,
-  configData.BUSD_ADDRESS,
   configData.HECTA_ADDRESS,
-  "0.2"
+  configData.BUSD_ADDRESS,
+  "0.0001"
 );

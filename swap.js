@@ -163,29 +163,36 @@ export const swap = async ({
       account.address,
       tokenOut
     );
+    console.log(
+      "allowanceToken1",
+      tokenIn,
+      Number(allowanceToken0),
+      Number(allowanceToken1)
+    );
 
     // approve router contract call to busd
-    if (!alreadyApprovedToken(allowanceToken0)) {
-      const approveTx = await tokenInContract.approve(
-        tokenIn,
-        "1000000000000000000000000",
-        {
-          gasPrice: ethers.utils.parseUnits(`${100}`, "gwei").toString(),
-          gasLimit: 1000000,
-        }
-      );
-    }
+    // if (!alreadyApprovedToken() || true) {
+    //   const approveTx = await tokenInContract.approve(
+    //     tokenIn,
+    //     "100000000000000000000000000",
+    //     {
+    //       gasPrice: ethers.utils.parseUnits(`${100}`, "gwei").toString(),
+    //       gasLimit: 1000000,
+    //     }
+    //   );
+    // }
+    // approve
 
-    if (!alreadyApprovedToken(allowanceToken1)) {
-      const approveTx = await tokenOutContract.approve(
-        tokenOut,
-        "1000000000000000000000000",
-        {
-          gasPrice: ethers.utils.parseUnits(`${100}`, "gwei").toString(),
-          gasLimit: 1000000,
-        }
-      );
-    }
+    // if (!alreadyApprovedToken(allowanceToken1) || true) {
+    //   const approveTx = await tokenOutContract.approve(
+    //     tokenOut,
+    //     "100000000000000000000000000",
+    //     {
+    //       gasPrice: ethers.utils.parseUnits(`${100}`, "gwei").toString(),
+    //       gasLimit: 1000000,
+    //     }
+    //   );
+    // }
 
     console.log("Proccecing swap...");
     // call router smart contract to buy token
@@ -197,7 +204,7 @@ export const swap = async ({
       recipient,
       Date.now() + 1000 * 60 * 5, //5 minutes
       {
-        gasLimit: "1000000",
+        gasLimit: "2000000",
         gasPrice: ethers.utils.parseUnits(`100`, "gwei"),
         nonce: null,
         value: 0,

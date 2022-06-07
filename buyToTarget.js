@@ -1,9 +1,9 @@
-import { swap } from "./bot.js";
+import { swap } from "./swap.js";
 import configData from "./config.js";
 import { getABIToPath, alreadyApprovedToken } from "./utils.js";
 import ethers from "ethers";
 import { saveData } from "./saveData.js";
-
+const FEE_DEFI = 0.0025;
 export async function buyToTarget(targetPrice, privateKey) {
   const provider = new ethers.providers.JsonRpcProvider(configData.RPC_URL);
   const wallet = new ethers.Wallet(privateKey);
@@ -27,7 +27,8 @@ export async function buyToTarget(targetPrice, privateKey) {
     Math.abs(
       ((busdBalance - targetPrice * hectaBalance) * nowPrice) /
         (targetPrice + nowPrice)
-    ) * 1.0025;
+    ) *
+    (1 + FEE_DEFI);
   // target giam
 
   let priceImpact;
