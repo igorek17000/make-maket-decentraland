@@ -1,6 +1,6 @@
 import ethers from "ethers";
 import fs from "fs";
-import { buyAction } from "./bot.js";
+import { swap } from "./bot.js";
 import configData from "./config.js";
 import { buyToTarget } from "./MM_Test.js";
 import { getABIToPath } from "./utils.js";

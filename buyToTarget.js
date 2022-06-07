@@ -1,4 +1,4 @@
-import { buyAction } from "./bot.js";
+import { swap } from "./bot.js";
 import configData from "./config.js";
 import { getABIToPath, alreadyApprovedToken } from "./utils.js";
 import ethers from "ethers";
@@ -6,7 +6,6 @@ import { saveData } from "./saveData.js";
 
 export async function buyToTarget(targetPrice, privateKey) {
   const provider = new ethers.providers.JsonRpcProvider(configData.RPC_URL);
-  console.log("privateKey", privateKey);
   const wallet = new ethers.Wallet(privateKey);
   const publicKey = await wallet.getAddress();
   const account = wallet.connect(provider);
@@ -15,8 +14,8 @@ export async function buyToTarget(targetPrice, privateKey) {
     getABIToPath("UniswapPair.json"),
     account
   );
-  const reverse = await pairContract.getReserves();
 
+  const reverse = await pairContract.getReserves();
   let tokenIn = configData.BUSD_ADDRESS;
   let tokenOut = configData.HECTA_ADDRESS;
 
@@ -46,8 +45,7 @@ export async function buyToTarget(targetPrice, privateKey) {
   }
 
   console.log("Amount in Fee and impact ", m, priceImpact);
-
-  const result = await buyAction({
+  const result = await swap({
     recipient: publicKey,
     privateKey,
     tokenIn,

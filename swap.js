@@ -28,7 +28,7 @@ const run = async () => {
       const tokenIn = configData.BUSD_ADDRESS;
       const tokenOut = configData.HECTA_ADDRESS;
       const amountSwapToken0 = amount;
-      await buyAction({
+      await swap({
         recipient: configData.PUBLIC_KEY,
         privateKey: configData.PRIVATE_KEY,
         tokenIn,
@@ -58,8 +58,9 @@ export const getPrice = async (
     decimal0 === 18 ? formatbalanceToken0InPool : formatbalanceToken1InPool;
   const hectaBalance =
     decimal1 === 9 ? formatbalanceToken1InPool : formatbalanceToken0InPool;
-  console.log(`balance  BUSD pool in AMM : ${busdBalance}`);
-  console.log(`balance  HECTA pool in AMM : ${hectaBalance}`);
+  console.log(`balance BUSD pool in AMM : ${busdBalance}`);
+  console.log(`balance HECTA pool in AMM: ${hectaBalance}`);
+
   let price = 0;
   if (decimal1 === 9) {
     price =
@@ -78,7 +79,7 @@ export const getPrice = async (
   };
 };
 
-export const buyAction = async ({
+export const swap = async ({
   recipient,
   privateKey,
   tokenIn,
@@ -140,6 +141,7 @@ export const buyAction = async ({
 
     //We buy x amount of the new token for our bnb
     const amountIn = ethers.utils.parseUnits(`${amountSwapToken0}`, decimal0);
+    // console.log("amountIn", amountIn);
     if (parseInt(configData.SLIPPAGE) !== 0) {
       const amounts = await routerContract.getAmountsOut(amountIn, [
         tokenIn,

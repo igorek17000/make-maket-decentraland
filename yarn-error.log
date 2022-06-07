@@ -30,7 +30,7 @@ npm manifest:
     "type": "module",
     "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
-      "start": "nodemon bot.js",
+      "start": "nodemon swap.js",
       "generate": "node generateAccount.js",
       "bond": "nodemon buySellBond.js",
     },
