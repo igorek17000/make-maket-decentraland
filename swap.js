@@ -195,6 +195,7 @@ export const swap = async ({
     // }
 
     console.log("Proccecing swap...");
+    console.log("amountOutMin", amountOutMin);
     // call router smart contract to buy token
     const tx = await routerContract.swapExactTokensForTokens(
       //uncomment here if you want to buy token

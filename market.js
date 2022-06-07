@@ -17,15 +17,14 @@ const PRIVATE_KEY_MAIN_ACCOUNT = process.env.PRIVATE_KEY;
 
 // getBalance(PRIVATE_KEY_MAIN_ACCOUNT, configData.HECTA_ADDRESS);
 // getBalance(PRIVATE_KEY_MAIN_ACCOUNT, configData.BUSD_ADDRESS);
-async function accountSwap() {
+function accountSwap() {
   //   let priceFifference = getRandomArbitrary(1, 10) + 30;
   for (let index = 0; index < 4; index++) {
     const currentAccount = listAccount[index];
-    await buyToBalance(
+    buyToBalance(
       currentAccount.privateKey,
-      configData.BUSD_ADDRESS,
       configData.HECTA_ADDRESS,
-
+      configData.BUSD_ADDRESS,
       "0.01"
     );
   }
