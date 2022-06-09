@@ -1,4 +1,5 @@
 import { Button, Table, DatePicker, Typography } from "antd";
+import { Col, Row } from "antd";
 import type { ColumnsType } from "antd/lib/table";
 import moment from "moment";
 import DoughnutComponent from "./Donut";
@@ -98,9 +99,6 @@ const BondOp = ({ listBond }: { listBond: any }) => {
       date.format("DD/MM/YYYY")
     );
   });
-  // const averagePrice = listBondFilter.reduce((a , b ) => {
-  //   a
-  // }) / listBondFilter.length
 
   const total =
     listBondFilter.reduce((a: any, b: any) => {
@@ -127,7 +125,7 @@ const BondOp = ({ listBond }: { listBond: any }) => {
       }, 0);
       result[item] = count;
     }
-    console.log("cascascas", result);
+
     setDataChart(result);
   }, []);
 
@@ -146,13 +144,20 @@ const BondOp = ({ listBond }: { listBond: any }) => {
           Giá trung bình của bond là : {formatNumber(total, 2)}
         </Typography>
       </div>
-      <div>{dataChart && <DoughnutComponent data={dataChart} />}</div>
-      <Table
-        pagination={false}
-        loading={!listBond}
-        columns={columns}
-        dataSource={listBondFilter}
-      />
+
+      <Row>
+        <Col span={18}>
+          <Table
+            pagination={false}
+            loading={!listBond}
+            columns={columns}
+            dataSource={listBondFilter}
+          />
+        </Col>
+        <Col span={6}>
+          {dataChart && <DoughnutComponent data={dataChart} />}
+        </Col>
+      </Row>
     </div>
   );
 };
