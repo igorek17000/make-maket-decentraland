@@ -23,5 +23,8 @@ export const getBalanceErc20 = async (privateKey, ecr20Address) => {
   return {
     balance: balance,
     decimal: decimal,
+    formatBalance,
   };
 };
+
+// getBalanceErc20(configData.PRIVATE_KEY, configData.HECTA_ADDRESS);

@@ -23,8 +23,8 @@ function accountSwap() {
     const currentAccount = listAccount[index];
     buyToBalance(
       currentAccount.privateKey,
-      configData.HECTA_ADDRESS,
       configData.BUSD_ADDRESS,
+      configData.HECTA_ADDRESS,
       "0.01"
     );
   }

@@ -22,7 +22,6 @@ export async function buyToTarget(targetPrice, privateKey) {
   const busdBalance = reverse[0] / 1e18;
   const hectaBalance = reverse[1] / 1e9;
   const nowPrice = busdBalance / hectaBalance;
-
   let m =
     Math.abs(
       ((busdBalance - targetPrice * hectaBalance) * nowPrice) /
@@ -54,6 +53,7 @@ export async function buyToTarget(targetPrice, privateKey) {
     tokenOut,
     amountSwapToken0: Math.round(m * (1 + priceImpact)),
   });
+
   const res = {
     ...result,
     ...{
@@ -63,4 +63,4 @@ export async function buyToTarget(targetPrice, privateKey) {
   saveData(res);
   return res;
 }
-buyToTarget(15, configData.PRIVATE_KEY);
+buyToTarget(1520, configData.PRIVATE_KEY);

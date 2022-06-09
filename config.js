@@ -2,17 +2,7 @@ import ethers from "ethers";
 import dotenv from "dotenv";
 dotenv.config();
 const configData = {
-  BNB: process.env.BNB_CONTRACT, //bnb
-  to_PURCHASE: process.env.TO_PURCHASE, // token that you will purchase = BUSD for test '0xe9e7cea3dedca5984780bafc599bd69add087d56'
-  AMOUNT_OF_BNB: process.env.AMOUNT_OF_BNB, // how much you want to buy in BNB
-
-  factory: process.env.FACTORY, //PancakeSwap V2 factory
-  router: process.env.ROUTER, //PancakeSwap V2 router
-
-  recipient: process.env.YOUR_ADDRESS, //your wallet address,
-
   Slippage: process.env.SLIPPAGE, //in Percentage
-
   gasPrice: ethers.utils.parseUnits(`${process.env.GWEI}`, "gwei"), //in gwei
   gasLimit: process.env.GAS_LIMIT, //at least 21000
   minBnb: process.env.MIN_LIQUIDITY_ADDED, //min liquidity added,
@@ -41,14 +31,14 @@ const configData = {
   },
 
   bsc: {
-    SLIPPAGE: "2",
+    SLIPPAGE: "0",
     PUBLIC_KEY: process.env.PUBLIC_KEY,
     PRIVATE_KEY: process.env.PRIVATE_KEY,
     // custom for feature swap
     ROUTER_ADDRESS: "0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3",
     FACTORY_ADDRESS: "0xB7926C0430Afb07AA7DEfDE6DA862aE0Bde767bc",
     BUSD_HECTA_ADDESS: "0x1A6409fCABcFbA421a5aB47d573CbB23909D0999",
-    RPC_URL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+    RPC_URL: "https://data-seed-prebsc-2-s3.binance.org:8545/",
     // custom config for hectagon project
     BUSD_ADDRESS: "0x9e3F47234e72e222348552e028ceEB8f4C428d26", // duplicate
     HECTA_ADDRESS: "0xDBa54CAE3C9BC6601D4d558dEB59c4F07688b5a7",

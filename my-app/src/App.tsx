@@ -1,52 +1,96 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import "./App.css";
 import axios from "axios";
-import { Input, Button } from "antd";
+import { Input, Button, Typography, Form, Tabs, Spin } from "antd";
 import "antd/dist/antd.css";
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBBPIkNfyH9jMUrH5PiSZ4cbl8-n7rl9hk",
-  authDomain: "fir-ok-a468d.firebaseapp.com",
-  databaseURL: "https://fir-ok-a468d.firebaseio.com",
-  projectId: "fir-ok-a468d",
-  storageBucket: "fir-ok-a468d.appspot.com",
-  messagingSenderId: "171026087399",
-  appId: "1:171026087399:web:8b818c47888d1f4f69d142",
-};
-
+import PoolMM from "./PoolMM";
+import BondOp from "./BondOp";
+const { TabPane } = Tabs;
+export function formatNumber(number: number | string, fixed = 2) {
+  return Number(number)
+    .toFixed(fixed)
+    .replace(/\d(?=(\d{3})+\.)/g, "$&,");
+}
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+
 function App() {
-  const [value, setValue] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const onSubmit = async () => {
-    setLoading(true);
-    const data = await axios.post("http://localhost:3001/swap", {
-      data: {
-        targetPrice: value,
-      },
+  const [data, setData] = useState<any>(null);
+  const [listBond, setListBond] = useState<any>(null);
+  const fetchData = async () => {
+    const rawData = await axios
+      .post("http://18.141.225.138:8000/subgraphs/name/test", {
+        query: `query MyQuery {
+            bondDeposits(skip: 0, first: 1000) {
+              amount
+              bondId
+              id
+              price
+              timestamp
+            }
+            bonds {
+              vesting
+              baseToken
+              conclusion
+              controlVariable
+              id
+              fixedTerm
+              initialPrice
+              maxDebt
+              quoteToken
+            }
+          }`,
+      })
+      .then((res) => res.data);
+    console.log("rawData", rawData);
+    const data = rawData.data;
+    const bondDeposits = data.bondDeposits;
+    const bonds = data.bonds;
+    const result = bondDeposits.map((bondDeposit: any) => {
+      const infoBond = bonds.find(
+        (bond: any) => bondDeposit.bondId === bond.id
+      );
+      infoBond.timeClaim =
+        Number(infoBond.vesting) + Number(bondDeposit.timestamp);
+      return { ...bondDeposit, ...infoBond };
     });
-    console.log("data", data);
-    setLoading(false);
+    console.log("result", result);
+    setListBond(result);
   };
+  const getData = () => {
+    axios.get("http://localhost:3001/balance").then(({ data: rawData }) => {
+      console.log("setData", data);
+      setData(rawData);
+    });
+  };
+  useEffect(() => {
+    fetchData();
+    getData();
+  }, []);
+
   return (
-    <div className="App">
-      <Input
-        value={value}
-        onChange={(e) => {
-          setValue(Number(e.target.value));
-        }}
-        placeholder="Target Price"
-        type="number"
-      />
-      <Button loading={loading} onClick={onSubmit}>
-        Swap{" "}
-      </Button>
+    <div className="wrapper">
+      <Tabs defaultActiveKey="1">
+        <TabPane tab="Info Wallet MM " key="1">
+          {!data ? (
+            <div
+              style={{
+                width: "100%",
+                height: "400px",
+                display: "grid",
+                placeItems: "center",
+              }}
+            >
+              <Spin />
+            </div>
+          ) : (
+            <PoolMM data={data} />
+          )}
+        </TabPane>
+        <TabPane tab="Bond" key="2">
+          <BondOp listBond={listBond} />
+        </TabPane>
+      </Tabs>
     </div>
   );
 }

@@ -37,6 +37,27 @@ const run = async () => {
       });
     });
 };
+export const getPriceV2 = async (pairAddress) => {
+  const provider = new ethers.providers.JsonRpcProvider(configData.RPC_URL);
+  const wallet = new ethers.Wallet(configData.PRIVATE_KEY);
+  const account = wallet.connect(provider);
+
+  const pairContract = new ethers.Contract(
+    pairAddress,
+    getABIToPath("UniswapPair.json"),
+    account
+  );
+
+  const reverse = await pairContract.getReserves();
+
+  const busdBalanceInPool = reverse[0] / 1e18;
+  const hectaBalanceInPool = reverse[1] / 1e9;
+  return {
+    busdBalanceInPool,
+    hectaBalanceInPool,
+    price: busdBalanceInPool / hectaBalanceInPool,
+  };
+};
 export const getPrice = async (
   tokenInContract,
   tokenOutContract,

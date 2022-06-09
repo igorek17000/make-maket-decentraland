@@ -12,12 +12,11 @@ export async function buyToBalance(
   //   console.log("privateKey", privateKey);
   const wallet = new ethers.Wallet(privateKey);
   const publicKey = await wallet.getAddress();
-  //   const account = wallet.connect(provider);
-
+  const account = wallet.connect(provider);
   const { balance, decimal } = await getBalanceErc20(privateKey, tokenIn);
   const formatBalance = ethers.utils.formatUnits(balance, Number(decimal));
   const amountSwapToken0 = (Number(formatBalance) * Number(percent)).toFixed(4);
-  console.log("amountSwapToken0", amountSwapToken0);
+
   const result = await swap({
     recipient: publicKey,
     privateKey,
@@ -25,13 +24,12 @@ export async function buyToBalance(
     tokenOut,
     amountSwapToken0,
   });
-
-  console.log("result ", result);
+  console.log("result", result);
 }
 
 buyToBalance(
   configData.PRIVATE_KEY,
   configData.HECTA_ADDRESS,
   configData.BUSD_ADDRESS,
-  "0.0001"
+  "0.001"
 );
