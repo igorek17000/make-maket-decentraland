@@ -7,7 +7,7 @@ import "antd/dist/antd.css";
 import PoolMM from "./PoolMM";
 import BondOp from "./BondOp";
 const { TabPane } = Tabs;
-const baseURL = true ? "http://18.141.225.138" : "http://localhost:3001";
+const baseURL = true ? "http://18.141.225.138:3001" : "http://localhost:3001";
 export function formatNumber(number: number | string, fixed = 2) {
   return Number(number)
     .toFixed(fixed)
