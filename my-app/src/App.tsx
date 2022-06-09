@@ -7,6 +7,10 @@ import "antd/dist/antd.css";
 import PoolMM from "./PoolMM";
 import BondOp from "./BondOp";
 const { TabPane } = Tabs;
+const baseURL =
+  process.env.NODE_ENV === "production"
+    ? "http://18.141.225.138"
+    : "http://localhost:3001";
 export function formatNumber(number: number | string, fixed = 2) {
   return Number(number)
     .toFixed(fixed)
@@ -58,7 +62,7 @@ function App() {
     setListBond(result);
   };
   const getData = () => {
-    axios.get("http://localhost:3001/balance").then(({ data: rawData }) => {
+    axios.get(`${baseURL}/balance`).then(({ data: rawData }) => {
       console.log("setData", data);
       setData(rawData);
     });
