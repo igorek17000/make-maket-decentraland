@@ -43,7 +43,7 @@ function App() {
           }`,
       })
       .then((res) => res.data);
-    console.log("rawData", rawData);
+    // console.log("rawData", rawData);
     const data = rawData.data;
     const bondDeposits = data.bondDeposits;
     const bonds = data.bonds;
@@ -55,12 +55,11 @@ function App() {
         Number(infoBond.vesting) + Number(bondDeposit.timestamp);
       return { ...bondDeposit, ...infoBond };
     });
-    console.log("result", result);
+
     setListBond(result);
   };
   const getData = () => {
     axios.get(`${baseURL}/balance`).then(({ data: rawData }) => {
-      console.log("setData", data);
       setData(rawData);
     });
   };

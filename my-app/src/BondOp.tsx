@@ -120,7 +120,6 @@ const BondOp = ({ listBond }: { listBond: any }) => {
       console.log("item", item);
       const count = groupData[item].reduce((a: number, b: any) => {
         const decimal = configToken[b.quoteToken].decimal;
-        // console.log("b.amount", b.amount);
         return a + b.amount / 10 ** decimal;
       }, 0);
       result[item] = count;
@@ -136,8 +135,8 @@ const BondOp = ({ listBond }: { listBond: any }) => {
           value={date || moment()}
           onChange={(date) => setDate(date)}
         />
+        <Button onClick={() => setDate(null)}>Clear </Button>
       </div>
-      {/* {JSON.stringify(result)} */}
       <div>
         <Typography>
           {" "}
