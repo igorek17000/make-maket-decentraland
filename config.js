@@ -29,14 +29,14 @@ const configData = {
   bsc: {},
 
   bsc_testnet: {
-    walletMM: [""],
+    walletMM: "0x8703d1C3cd670dd678ddFacA1e98237f6a342C3C",
     SLIPPAGE: "0",
     PUBLIC_KEY: process.env.PUBLIC_KEY,
     PRIVATE_KEY: process.env.PRIVATE_KEY,
     // custom for feature swap
     ROUTER_ADDRESS: "0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3",
     FACTORY_ADDRESS: "0xB7926C0430Afb07AA7DEfDE6DA862aE0Bde767bc",
-    BUSD_HECTA_ADDESS: "0x1A6409fCABcFbA421a5aB47d573CbB23909D0999",
+    BUSD_HECTA_ADDESS: "0xe10ddE9a9Ece840365a04CE85Eb9ca496e2489e6",
     RPC_URL: "https://data-seed-prebsc-2-s3.binance.org:8545/",
     // custom config for hectagon project
 

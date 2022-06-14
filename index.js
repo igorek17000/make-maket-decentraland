@@ -3,7 +3,7 @@ import { swap } from "./swap.js";
 import bodyParser from "body-parser";
 import cors from "cors";
 import configData from "./config.js";
-import { getBalanceErc20 } from "./getBalanceErc20.js";
+import { getBalanceErc20, getHectaMetric } from "./getBalanceErc20.js";
 import { getPriceV2 } from "./swap.js";
 // Import the functions you need from the SDKs you need
 
@@ -34,6 +34,10 @@ router.get("/balance", async (req, res) => {
 
 router.post("/swap", async (req, res) => {
   const data = await swap(req.body.targetPrice);
+  return res.json(data);
+});
+router.get("/metric", async (req, res) => {
+  const data = await getHectaMetric();
   return res.json(data);
 });
 app.use("/", router);
