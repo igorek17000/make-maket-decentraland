@@ -7,6 +7,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 export default function DoughnutComponent({ data }: any) {
   const dataChart = {
     labels: Object.keys(data),
+
     datasets: [
       {
         label: "# of Votes",
@@ -31,5 +32,32 @@ export default function DoughnutComponent({ data }: any) {
       },
     ],
   };
-  return <Doughnut data={dataChart} />;
+  return (
+    <Doughnut
+      data={dataChart}
+      // plugins={{
+      //   tooltips: {
+      //     callbacks: {
+      //       label: function (tooltipItem: any, data: any) {
+      //         //get the concerned dataset
+      //         var dataset = data.datasets[tooltipItem.datasetIndex];
+      //         //calculate the total of this data set
+      //         var total = dataset.data.reduce(function (
+      //           previousValue: any,
+      //           currentValue: any
+      //         ) {
+      //           return previousValue + currentValue;
+      //         });
+      //         //get the current items value
+      //         var currentValue = dataset.data[tooltipItem.index];
+      //         //calculate the precentage based on the total and current item, also this does a rough rounding to give a whole number
+      //         var percentage = Math.floor((currentValue / total) * 100 + 0.5);
+
+      //         return percentage + "%";
+      //       },
+      //     },
+      //   },
+      // }}
+    />
+  );
 }

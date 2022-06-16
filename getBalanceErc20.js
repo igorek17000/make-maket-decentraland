@@ -24,6 +24,7 @@ export const getBalanceErc20 = async (privateKey, ecr20Address) => {
   return {
     balance: balance,
     decimal: decimal,
+    formatBalance,
   };
 };
 export const getBalanceErc20ToPublicKey = async (publicKey, ecr20Address) => {
@@ -61,7 +62,12 @@ export const getHectaMetric = async (address = "") => {
     getABIToPath("sHecta.json"),
     provider
   );
-
+  const stakingContract = new ethers.Contract(
+    configData.STAKING_ADDRESS,
+    getABIToPath("staking.json"),
+    provider
+  );
+  const currentIndex = await stakingContract.index();
   const gHectaContract = new ethers.Contract(
     configData.GHECTA_ADDRESS,
     getABIToPath("gHecta.json"),
@@ -144,23 +150,34 @@ export const getHectaMetric = async (address = "") => {
   );
 
   console.log("--------- Hecta End -------------");
-
+  const formatbpGhecta = ethers.utils.formatEther(
+    balanceGHectaInBondDepository
+  );
   return {
+    currentIndex: Number(currentIndex),
     hecta: {
       mm: hectaInMMwallet,
       pool: hectaInPool,
       staking: hectaInStaking,
-      totalSupply: ethers.utils.formatUnits(totalSupplyHecta, 9),
+      user:
+        Number(ethers.utils.formatUnits(totalSupplyHecta, 9)) -
+        hectaInStaking -
+        hectaInPool -
+        hectaInMMwallet,
     },
     sHecta: {
       staking: ethers.utils.formatUnits(shectaInStaking, 9),
       mm: ethers.utils.formatUnits(numberSHectaInWallet, 9),
     },
     gHecta: {
-      bd: ethers.utils.formatEther(balanceGHectaInBondDepository),
+      bd: formatbpGhecta,
       staking: gHectaInStaking,
       mm: gHectaInWalletMM,
-      totalSupply: ethers.utils.formatUnits(totalSupplyGHecta, 18),
+      user:
+        Number(ethers.utils.formatUnits(totalSupplyGHecta, 18)) -
+        Number(formatbpGhecta) -
+        Number(gHectaInStaking) -
+        Number(gHectaInWalletMM),
     },
   };
 };

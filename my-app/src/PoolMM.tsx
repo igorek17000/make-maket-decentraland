@@ -5,7 +5,7 @@ import axios from "axios";
 import { Input, Button, Typography, Form, Tabs, Spin } from "antd";
 import { formatNumber } from "./App";
 const FEE_DEFI = 0.0025;
-export default function PoolMM({ data }: any) {
+export default function PoolMM({ data, metric }: any) {
   const [targetPrice, setTargetPrice] = useState(0);
   const [amountSwap, setAmountSwap] = useState(0);
   const {
@@ -26,12 +26,17 @@ export default function PoolMM({ data }: any) {
     setAmountSwap(m);
     setTargetPrice(targetPrice);
   };
+  const hectaFloating =
+    Number(metric.hecta.user) +
+    Number(metric.gHecta.user) * (Number(metric.currentIndex) / 10 ** 9);
   const a = Number(busdBalanceInPool);
   const x = Number(hectaBalanceInPool);
   const m = Number(balanceBusd);
   const n = Number(balanceHecta);
   const priceMax = (a + m) ** 2 / (a * x);
   const priceMin = (a * x) / (n + x) ** 2;
+  const priceWhenFloating = (a * x) / (hectaFloating + x) ** 2;
+
   return (
     <div>
       <Typography>
@@ -49,7 +54,6 @@ export default function PoolMM({ data }: any) {
       <Typography>
         Current Price:<b> {formatNumber(data.price)}</b>
       </Typography>
-
       {/* <Button onClick={onTargetPrice}>Submit</Button> */}
 
       <Typography>
@@ -86,6 +90,18 @@ export default function PoolMM({ data }: any) {
         </Typography>
       ) : (
         0
+      )}
+      {priceWhenFloating && (
+        <Typography>
+          Khi user xả <b>{formatNumber(hectaFloating)}</b> Hecta
+          <i style={{ color: "gray" }}>
+            (<b> {formatNumber(metric.hecta.user)}</b> HECTA và{" "}
+            <b>{formatNumber(metric.gHecta.user)}</b> Ghecta với currentIndex
+            bằng
+            <b> {formatNumber(metric.currentIndex / 1e9)}</b> )
+          </i>{" "}
+          thì giá về :<b> {formatNumber(priceWhenFloating)}</b>
+        </Typography>
       )}
     </div>
   );

@@ -27,9 +27,9 @@ export async function buyToBalance(
   console.log("result", result);
 }
 
-buyToBalance(
-  configData.PRIVATE_KEY,
-  configData.HECTA_ADDRESS,
-  configData.BUSD_ADDRESS,
-  "0.001"
-);
+// buyToBalance(
+//   configData.PRIVATE_KEY,
+//   configData.HECTA_ADDRESS,
+//   configData.BUSD_ADDRESS,
+//   "0.001"
+// );
