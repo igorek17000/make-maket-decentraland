@@ -1,46 +1,36 @@
 import express from "express";
-import { swap } from "./swap.js";
+
 import bodyParser from "body-parser";
 import cors from "cors";
-import configData from "./config.js";
-import { getBalanceErc20, getHectaMetric } from "./getBalanceErc20.js";
-import { getPriceV2 } from "./swap.js";
 // Import the functions you need from the SDKs you need
-
+import path from "path";
 const app = express();
-const router = express.Router();
+// const router = express.Router();
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+import router from "./router.js";
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const port = 3001;
-// respond with "hello world" when a GET request is made to the homepage
-router.get("/balance", async (req, res) => {
-  const { formatBalance: balanceHecta } = await getBalanceErc20(
-    configData.PRIVATE_KEY,
-    configData.HECTA_ADDRESS
-  );
-  const { formatBalance: balanceBusd } = await await getBalanceErc20(
-    configData.PRIVATE_KEY,
-    configData.BUSD_ADDRESS
-  );
-  const resultV2 = await getPriceV2(configData.BUSD_HECTA_ADDESS);
-  res.send({
-    balanceHecta,
-    balanceBusd,
-    ...resultV2,
-  });
+
+// Have Node serve the files for our built React app
+app.use(express.static(path.resolve(__dirname, "./frontend/build")));
+
+// Handle GET requests to /api route
+app.get("/api", (req, res) => {
+  res.json({ message: "Hello from server!" });
 });
 
-router.post("/swap", async (req, res) => {
-  const data = await swap(req.body.targetPrice);
-  return res.json(data);
+// All other GET requests not handled before will return our React app
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "./frontend/build", "index.html"));
 });
-router.get("/metric", async (req, res) => {
-  const data = await getHectaMetric();
-  return res.json(data);
-});
-app.use("/", router);
+// respond with "hello world" when a GET request is made to the homepage
+
+app.use("/api", router);
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
