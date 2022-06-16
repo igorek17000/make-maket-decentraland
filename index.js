@@ -20,17 +20,13 @@ const port = 3001;
 app.use(express.static(path.resolve(__dirname, "./frontend/build")));
 
 // Handle GET requests to /api route
-app.get("/api", (req, res) => {
-  res.json({ message: "Hello from server!" });
-});
-
+app.use("/api", router);
 // All other GET requests not handled before will return our React app
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "./frontend/build", "index.html"));
 });
 // respond with "hello world" when a GET request is made to the homepage
 
-app.use("/api", router);
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

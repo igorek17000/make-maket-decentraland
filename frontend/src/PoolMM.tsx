@@ -6,6 +6,7 @@ import { Input, Button, Typography, Form, Tabs, Spin } from "antd";
 import { formatNumber } from "./App";
 const FEE_DEFI = 0.0025;
 export default function PoolMM({ data, metric }: any) {
+  console.log("data metric", metric, data);
   const [targetPrice, setTargetPrice] = useState(0);
   const [amountSwap, setAmountSwap] = useState(0);
   const {

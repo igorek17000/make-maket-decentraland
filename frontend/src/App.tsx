@@ -8,7 +8,8 @@ import PoolMM from "./PoolMM";
 import BondOp from "./BondOp";
 import Volumn from "./Volumn";
 const { TabPane } = Tabs;
-const baseURL = "/api";
+const baseURL =
+  process.env.NODE_ENV === "production" ? "/api" : "http://localhost:3001/api";
 export function formatNumber(number: number | string, fixed = 2) {
   return Number(number)
     .toFixed(fixed)
@@ -72,7 +73,7 @@ function App() {
     });
   };
   useEffect(() => {
-    fetchData();
+    // fetchData();
     getBalance();
     getMetric();
   }, []);
@@ -100,7 +101,7 @@ function App() {
           )}
         </TabPane>
         <TabPane tab="Bond" key="2">
-          <BondOp listBond={listBond} />
+          {/* <BondOp listBond={listBond} /> */}
         </TabPane>
         <TabPane tab="Metric" key="3">
           <Metric metric={metric} />
