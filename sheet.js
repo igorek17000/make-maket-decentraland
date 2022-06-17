@@ -28,9 +28,9 @@ function callBackFilterData(data) {
       item.price = Number(item.price) / 1e18;
     }
     if (item.timestamp) {
-      item.timestamp = moment(item.timestamp * 1000).format(
-        "MMMM Do YYYY, h:mm:ss a"
-      );
+      item.timestamp = moment(item.timestamp * 1000)
+        .local()
+        .format("MMMM Do YYYY, h:mm:ss a");
     }
     if (item.currency) {
       item.currency = BUSD_ADDRESS === item.currency ? "BUSD" : "BNB";
