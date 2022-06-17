@@ -104,7 +104,7 @@ function App() {
           {/* <BondOp listBond={listBond} /> */}
         </TabPane>
         <TabPane tab="Metric" key="3">
-          <Metric metric={metric} />
+          <Metric metric={metric} data={data} />
         </TabPane>
         <TabPane tab="Volume" key="4">
           <Volumn />

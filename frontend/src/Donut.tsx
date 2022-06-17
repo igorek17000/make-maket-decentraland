@@ -7,7 +7,6 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 export default function DoughnutComponent({ data }: any) {
   const dataChart = {
     labels: Object.keys(data),
-
     datasets: [
       {
         label: "# of Votes",
