@@ -30,6 +30,7 @@ function callBackFilterData(data) {
     if (item.timestamp) {
       item.timestamp = moment(item.timestamp * 1000)
         .local()
+        .add(7, "hours")
         .format("MMMM Do YYYY, h:mm:ss a");
     }
     if (item.currency) {
@@ -150,9 +151,12 @@ function runAll() {
 
 function runCronJon() {
   cron.schedule("* * * * *", function () {
-    console.log("time run", moment().local().format("MMMM Do YYYY, h:mm:ss a"));
+    console.log(
+      "time run",
+      moment().local().add(7, "h").format("MMMM Do YYYY, h:mm:ss a")
+    );
     runAll();
   });
 }
-// runAll();
+
 runCronJon();
