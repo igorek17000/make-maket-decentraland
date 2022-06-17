@@ -150,7 +150,7 @@ function runAll() {
 
 function runCronJon() {
   cron.schedule("* * * * *", function () {
-    // console.log("run..");
+    console.log("time run", moment().local().format("MMMM Do YYYY, h:mm:ss a"));
     runAll();
   });
 }
