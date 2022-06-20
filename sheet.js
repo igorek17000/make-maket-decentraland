@@ -258,18 +258,21 @@ async function updateBalance(listAddress) {
   }
 }
 
-function runCronJon() {
+async function runCronJon() {
+  const walletList = await getDataToSheetId("MMwallet");
   cron.schedule("* * * * *", function () {
     console.log(
       "time run",
       moment().local().add(7, "h").format("MMMM Do YYYY, h:mm:ss a")
     );
-    all();
+    runAll(walletList);
   });
-}
-async function all() {
-  const walletList = await getDataToSheetId("MMwallet");
-  await runAll(walletList);
-  await updateBalance(walletList);
+  cron.schedule("00 59 * * * *", function () {
+    console.log(
+      "time update balance",
+      moment().local().add(7, "h").format("MMMM Do YYYY, h:mm:ss a")
+    );
+    updateBalance(walletList);
+  });
 }
 runCronJon();
