@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { getABIToPath } from "./utils.js";
 import { google } from "googleapis";
 import cron from "node-cron";
 import converter from "json-2-csv";
@@ -193,11 +193,22 @@ function runAll(walletList) {
     async (query) => await run({ ...query, ...{ spreadsheetId, walletList } })
   );
 }
+const getOwnerAddress = async (provider, address) => {
+  const NFT_CONTRACT = "0xaf19C47b5Cd0ebe590f5A56cb1418E7A3CD6B3Af";
+  const nftContract = new ethers.Contract(
+    NFT_CONTRACT,
+    getABIToPath("NFT.json"),
+    provider
+  );
+  const balance = await nftContract.balanceOf(address);
+  const listId = await nftContract.getTokenIdsPage(address, 0, Number(balance));
+  return listId.map((id) => Number(id));
+};
 
 async function updateBalance(listAddress) {
   const provider = new ethers.providers.JsonRpcProvider(RPC_MAINNET);
   const BUSD_ADDRESS = "0xe9e7cea3dedca5984780bafc599bd69add087d56";
-  const balances = [];
+
   const { results: nftMarketplaces } = await axios
     .get(API_LINK_MARKETPLACE)
     .then((raw) => raw.data);
@@ -208,14 +219,15 @@ async function updateBalance(listAddress) {
       BUSD_ADDRESS,
       provider
     );
-    // const arrayNFTId = nftMarketplaces
-    //   .filter((nft) => nft.seller.toLowerCase() === address.toLowerCase())
-    //   .map((nft) => nft.nftId)
-    //   .join(",");
+    const listId = await getOwnerAddress(provider, address);
+    const arrayNFTId = nftMarketplaces
+      .filter((nft) => nft.seller.toLowerCase() === address.toLowerCase())
+      .map((nft) => nft.nftId)
+      .join(",");
     // console.log("nftMarketplaces", nftMarketplaces);
-    console.log("balance", address, formatBalance);
+    // console.log("balance", address, formatBalance);
     // balances.push(formatBalance);
-    googleSheets.spreadsheets.values.append({
+    await googleSheets.spreadsheets.values.update({
       spreadsheetId,
       range: `MMwallet!C${Number(listAddress[address]) + 1}`,
 
@@ -224,22 +236,26 @@ async function updateBalance(listAddress) {
         values: [[formatBalance]],
       },
     });
-    // googleSheets.spreadsheets.values.append({
-    //   spreadsheetId,
-    //   range: `MMwallet!D${Number(listAddress[address]) + 1}`,
 
-    //   valueInputOption: "USER_ENTERED",
-    //   resource: {
-    //     values: [[arrayNFTId]],
-    //   },
-    // });
+    await googleSheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `MMwallet!D${Number(listAddress[address]) + 1}`,
 
-    // console.log("balancebalance", formatBalance);
+      valueInputOption: "USER_ENTERED",
+      resource: {
+        values: [[arrayNFTId]],
+      },
+    });
+    await googleSheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `MMwallet!E${Number(listAddress[address]) + 1}`,
+
+      valueInputOption: "USER_ENTERED",
+      resource: {
+        values: [[listId.join()]],
+      },
+    });
   }
-
-  // getBalanceErc20ToPublicKey(   BUSD_ADDRESS);
-
-  // ethers;
 }
 
 function runCronJon() {
@@ -253,9 +269,7 @@ function runCronJon() {
 }
 async function all() {
   const walletList = await getDataToSheetId("MMwallet");
-  // await runAll(walletList);
+  await runAll(walletList);
   await updateBalance(walletList);
 }
-// runCronJon();
-// await getListNFTMarketplace();
-all();
+runCronJon();
