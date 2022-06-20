@@ -27,11 +27,15 @@ export const getBalanceErc20 = async (privateKey, ecr20Address) => {
     formatBalance,
   };
 };
-export const getBalanceErc20ToPublicKey = async (publicKey, ecr20Address) => {
+export const getBalanceErc20ToPublicKey = async (
+  publicKey,
+  ecr20Address,
+  rawProvider = provider
+) => {
   const ecr20Contract = new ethers.Contract(
     ecr20Address,
     getABIToPath("ecr20abi.json"),
-    provider
+    rawProvider
   );
 
   const decimal = await ecr20Contract.decimals();

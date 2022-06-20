@@ -5,14 +5,19 @@ import cron from "node-cron";
 import converter from "json-2-csv";
 import { exit } from "process";
 import moment from "moment";
+import { ethers } from "ethers";
+import { getBalanceErc20ToPublicKey } from "./getBalanceErc20.js";
 const BUSD_ADDRESS = "0xe9e7cea3dedca5984780bafc599bd69add087d56";
 const node = "test";
+const RPC_MAINNET = "https://bsc-dataseed1.binance.org/";
 const BASE_URL = "http://18.142.55.57:8000/subgraphs/name/" + node;
 
 const auth = new google.auth.GoogleAuth({
   keyFile: "credentials.json",
   scopes: "https://www.googleapis.com/auth/spreadsheets",
 });
+const API_LINK_MARKETPLACE =
+  "https://tigertribe.hectagon.finance/api/listings?limit=1000&offset=0";
 
 // Create client instance for auth
 const client = await auth.getClient();
@@ -21,9 +26,8 @@ const client = await auth.getClient();
 const googleSheets = google.sheets({ version: "v4", auth: client });
 
 const spreadsheetId = "1TIeHY_-jzy54hhalNfy45JVKqeKeDlcI0IHNNebjD6U";
-let walletMMs = {};
 
-function callBackFilterData(data, categorySheet, walletList) {
+function callBackFilterData(data, walletList) {
   return data.map((item) => {
     if (item.price) {
       item.price = Number(item.price) / 1e18;
@@ -56,7 +60,7 @@ function importDataToSheet({
   walletList,
 }) {
   converter.json2csv(
-    callBackFilterData(jsonData, sheetName, walletList),
+    callBackFilterData(jsonData, walletList),
     async (err, csv) => {
       if (err) {
         throw err;
@@ -100,16 +104,15 @@ async function convertArraytoObject(data) {
   });
   return result;
 }
+
 async function getDataToSheetId(sheetName) {
   const { data } = await googleSheets.spreadsheets.values.get({
     spreadsheetId,
     range: sheetName,
     auth: client,
   });
-  walletMMs = convertArraytoObject(data.values);
+  let walletMMs = convertArraytoObject(data.values);
   return walletMMs;
-  // console.log("dataa", data.values);
-  console.log("walll", walletMMs);
 }
 async function run({ query, spreadsheetId, sheetId, walletList }) {
   const { data } = await axios
@@ -122,7 +125,7 @@ async function run({ query, spreadsheetId, sheetId, walletList }) {
       exit();
     });
   const key = Object.keys(data)[0];
-  console.log("import data for " + key);
+  // console.log("import data for " + key);
   await importDataToSheet({
     jsonData: data[key],
     spreadsheetId,
@@ -191,6 +194,54 @@ function runAll(walletList) {
   );
 }
 
+async function updateBalance(listAddress) {
+  const provider = new ethers.providers.JsonRpcProvider(RPC_MAINNET);
+  const BUSD_ADDRESS = "0xe9e7cea3dedca5984780bafc599bd69add087d56";
+  const balances = [];
+  const { results: nftMarketplaces } = await axios
+    .get(API_LINK_MARKETPLACE)
+    .then((raw) => raw.data);
+
+  for (let address in listAddress) {
+    const { formatBalance } = await getBalanceErc20ToPublicKey(
+      address,
+      BUSD_ADDRESS,
+      provider
+    );
+    // const arrayNFTId = nftMarketplaces
+    //   .filter((nft) => nft.seller.toLowerCase() === address.toLowerCase())
+    //   .map((nft) => nft.nftId)
+    //   .join(",");
+    // console.log("nftMarketplaces", nftMarketplaces);
+    console.log("balance", address, formatBalance);
+    // balances.push(formatBalance);
+    googleSheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: `MMwallet!C${Number(listAddress[address]) + 1}`,
+
+      valueInputOption: "USER_ENTERED",
+      resource: {
+        values: [[formatBalance]],
+      },
+    });
+    // googleSheets.spreadsheets.values.append({
+    //   spreadsheetId,
+    //   range: `MMwallet!D${Number(listAddress[address]) + 1}`,
+
+    //   valueInputOption: "USER_ENTERED",
+    //   resource: {
+    //     values: [[arrayNFTId]],
+    //   },
+    // });
+
+    // console.log("balancebalance", formatBalance);
+  }
+
+  // getBalanceErc20ToPublicKey(   BUSD_ADDRESS);
+
+  // ethers;
+}
+
 function runCronJon() {
   cron.schedule("* * * * *", function () {
     console.log(
@@ -202,7 +253,9 @@ function runCronJon() {
 }
 async function all() {
   const walletList = await getDataToSheetId("MMwallet");
-  await runAll(walletList);
+  // await runAll(walletList);
+  await updateBalance(walletList);
 }
-runCronJon();
-// all();
+// runCronJon();
+// await getListNFTMarketplace();
+all();
