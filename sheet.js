@@ -21,12 +21,20 @@ const client = await auth.getClient();
 const googleSheets = google.sheets({ version: "v4", auth: client });
 
 const spreadsheetId = "1TIeHY_-jzy54hhalNfy45JVKqeKeDlcI0IHNNebjD6U";
+let walletMMs = {};
 
-function callBackFilterData(data) {
+function callBackFilterData(data, categorySheet, walletList) {
   return data.map((item) => {
     if (item.price) {
       item.price = Number(item.price) / 1e18;
     }
+    if (item.buyer) {
+      item["MM index Buyer"] = walletList[item.buyer] || 0;
+    }
+    if (item.seller) {
+      item["MM index seller"] = walletList[item.seller] || 0;
+    }
+
     if (item.timestamp) {
       item.timestamp = moment(item.timestamp * 1000)
         .local()
@@ -40,39 +48,70 @@ function callBackFilterData(data) {
     return item;
   });
 }
-function importDataToSheet({ jsonData, spreadsheetId, sheetId, sheetName }) {
-  converter.json2csv(callBackFilterData(jsonData), async (err, csv) => {
-    if (err) {
-      throw err;
+function importDataToSheet({
+  jsonData,
+  spreadsheetId,
+  sheetId,
+  sheetName,
+  walletList,
+}) {
+  converter.json2csv(
+    callBackFilterData(jsonData, sheetName, walletList),
+    async (err, csv) => {
+      if (err) {
+        throw err;
+      }
+      const request = {
+        spreadsheetId,
+        resource: {
+          requests: [
+            {
+              updateSheetProperties: {
+                properties: { title: sheetName, sheetId },
+                fields: "title",
+              },
+            },
+            {
+              pasteData: {
+                data: csv,
+                delimiter: ",",
+                coordinate: { rowIndex: 0, columnIndex: 0, sheetId },
+              },
+            },
+          ],
+        },
+
+        auth: client,
+      };
+
+      // print CSV string
+      await googleSheets.spreadsheets.batchUpdate(request);
     }
-    const request = {
-      spreadsheetId,
-      resource: {
-        requests: [
-          {
-            updateSheetProperties: {
-              properties: { title: sheetName, sheetId },
-              fields: "title",
-            },
-          },
-          {
-            pasteData: {
-              data: csv,
-              delimiter: ",",
-              coordinate: { rowIndex: 0, columnIndex: 0, sheetId },
-            },
-          },
-        ],
-      },
-
-      auth: client,
-    };
-
-    // print CSV string
-    await googleSheets.spreadsheets.batchUpdate(request);
-  });
+  );
 }
-async function run({ query, spreadsheetId, sheetId }) {
+async function convertArraytoObject(data) {
+  let result = {};
+  data.map((item, key) => {
+    if (key < 1) {
+      return null;
+    }
+    result[item[1]?.toLowerCase()] = item[0];
+    return null;
+  });
+  return result;
+}
+async function getDataToSheetId(sheetName) {
+  const { data } = await googleSheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: sheetName,
+    auth: client,
+  });
+  walletMMs = convertArraytoObject(data.values);
+  return walletMMs;
+  // console.log("dataa", data.values);
+  console.log("walll", walletMMs);
+}
+async function run({ query, spreadsheetId, sheetId, walletList }) {
   const { data } = await axios
     .post(BASE_URL, {
       query,
@@ -89,10 +128,11 @@ async function run({ query, spreadsheetId, sheetId }) {
     spreadsheetId,
     sheetId,
     sheetName: key,
+    walletList,
   });
 }
 
-function runAll() {
+function runAll(walletList) {
   const querys = [
     {
       query: `{
@@ -110,11 +150,11 @@ function runAll() {
     {
       query: `{
             purchases(first: 1000) {
-              currency
-              buyer
               id
+              currency
               nftID
               price
+              buyer
               seller
               timestamp
             }
@@ -146,7 +186,9 @@ function runAll() {
       sheetId: 2131272706,
     },
   ];
-  querys.map(async (query) => await run({ ...query, ...{ spreadsheetId } }));
+  querys.map(
+    async (query) => await run({ ...query, ...{ spreadsheetId, walletList } })
+  );
 }
 
 function runCronJon() {
@@ -155,8 +197,12 @@ function runCronJon() {
       "time run",
       moment().local().add(7, "h").format("MMMM Do YYYY, h:mm:ss a")
     );
-    runAll();
+    all();
   });
 }
-
+async function all() {
+  const walletList = await getDataToSheetId("MMwallet");
+  await runAll(walletList);
+}
 runCronJon();
+// all();
